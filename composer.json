@@ -1,5 +1,5 @@
 {
-  "name": "etre2/translation-sitter",
+  "name": "pino/translation-sitter",
   "description": "Babysit Magento Translations",
   "type": "magento-module",
   "license": "MIT",
@@ -7,6 +7,10 @@
     {
       "name": "Tyler Mills",
       "email": "tylerssn@gmail.com"
+    },
+    {
+      "name": "Joachim Havloujian",
+      "email": "j.havloujian@techdivision.com"
     }
   ],
   "require": {

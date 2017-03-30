@@ -15,11 +15,6 @@ class Etre_TranslationSitter_Block_Log extends Mage_Adminhtml_Block_Widget_Grid_
         $this->_headerText = $this->__('Translation Overrides');
         //$this->_addButtonLabel  = $this->__('Import');
 
-        $this->addButton("import", [
-            'label'   => $this->__('Import'),
-            'onclick' => "setLocation('{$this->getImportUrl()}')",
-            'class'   => $this->__('add'),
-        ]);
         $this->addButton("export-csv", [
             'label'   => $this->__('Export CSV'),
             'onclick' => "setLocation('{$this->getExportUrlByFormat("csv")}')",
@@ -31,7 +26,9 @@ class Etre_TranslationSitter_Block_Log extends Mage_Adminhtml_Block_Widget_Grid_
             'onclick' => "setLocation('{$this->getExportUrlByFormat("xml")}')",
             'class'   => $this->__('export'),
         ]);
+
         parent::__construct();
+        $this->_removeButton('add');
     }
 
     /**

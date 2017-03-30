@@ -324,10 +324,10 @@ class Etre_TranslationSitter_Adminhtml_Translation_LogController extends Mage_Ad
     {
         switch ($this->getRequest()->getParam("format")):
             case "xml":
-                return $this->exportXml();
+                return $this->exportXmlAction();
                 break;
             case "csv":
-                return $this->exportCsv();
+                return $this->exportCsvAction();
                 break;
             default:
                 return $this->redirectReferrerWithError($this->__("Invalid export format requested."));
@@ -337,7 +337,7 @@ class Etre_TranslationSitter_Adminhtml_Translation_LogController extends Mage_Ad
     /**
      * @return Mage_Adminhtml_Controller_Action
      */
-    public function exportXml()
+    public function exportXmlAction()
     {
         $fileName = $this->EXPORT_FILE_NAME . '.xml';
         if ($grid = $this->getLayout()->createBlock($this->BLOCK_TRANSLATION_GRID)):
@@ -360,7 +360,7 @@ class Etre_TranslationSitter_Adminhtml_Translation_LogController extends Mage_Ad
     /**
      * @return Mage_Adminhtml_Controller_Action
      */
-    public function exportCsv()
+    public function exportCsvAction()
     {
         $fileName = $this->EXPORT_FILE_NAME . '.csv';
         if ($grid = $this->getLayout()->createBlock($this->BLOCK_TRANSLATION_GRID)):

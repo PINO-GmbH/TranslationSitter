@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Etre_TranslationSitter>
-            <version>0.2.0</version>
+            <version>0.1.0</version>
         </Etre_TranslationSitter>
     </modules>
     <global>
@@ -15,7 +15,7 @@
                 <class>Etre_TranslationSitter_Model_Resource</class>
                 <entities>
                     <translations>
-                        <table>core_translate</table>
+                        <table>etre_translate</table>
                     </translations>
                 </entities>
             </etre_translationsitter_resource>
