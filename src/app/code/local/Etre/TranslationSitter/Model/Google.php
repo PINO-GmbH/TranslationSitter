@@ -126,32 +126,23 @@ class Etre_TranslationSitter_Model_Google
      */
     protected function logTranslation($string, $translated, $source = "Translation Sitter Log")
     {
+        /** @var Etre_TranslationSitter_Model_Translations $translationSitter */
         $translationSitter = Mage::getModel("etre_translationsitter/translations");
-        $translationSitter->setString($string);
-        $translationSitter->setTranslationsitterSource($source);
-        $translationSitter->setStoreId($this->getStoreId());
-        $translationSitter->setTranslate($translated);
-        $translationSitter->setLocale($this->getLocale());
-        $translationSitter->setCrcString(crc32($string));
+        $uniqueIndex = [
+            'string' => $string,
+            'crc_string' => crc32($string),
+            'locale' => $this->getLocale(),
+        ];
+        $translationSitter->loadByUniqueIndex($uniqueIndex);
+        $translationSitter->setData('translationsitter_source', $source);
+        $translationSitter->setData('store_id', $this->getStoreId());
+        $translationSitter->setData('translate', $translated);
+
         try {
             $translationSitter->save();
         } catch (Exception $e) {
             Mage::logException($e);
         }
-        /*$coreResource = Mage::getSingleton("core/resource");
-        $write = $coreResource->getConnection("core_write");
-        $query = "insert into {$coreResource->getTableName("core/translate")} "
-            . "(string, store_id, translate, locale, crc_string, is_from_translationsitter) values "
-            . "(:string, :store_id, :translate, :locale, :crc_string, 1)";
-
-        $binds = [
-            'string'     => $string,
-            'store_id'   => $this->getStoreId(),
-            'translate'  => $translated,
-            'locale'     => $this->getLocale(),
-            'crc_string' => crc32($string),
-        ];
-        $write->query($query, $binds);*/
     }
 
     /**
