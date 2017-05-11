@@ -22,9 +22,9 @@ class Etre_TranslationSitter_Model_Resource_Translations extends Mage_Core_Model
 
             if ($data) {
                 $object->setData($data);
+            } else {
+                $object->addData($uniqueIndex);
             }
-        } else {
-            $object->addData($uniqueIndex);
         }
 
         $this->unserializeFields($object);

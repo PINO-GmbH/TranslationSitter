@@ -129,13 +129,13 @@ class Etre_TranslationSitter_Model_Google
         /** @var Etre_TranslationSitter_Model_Translations $translationSitter */
         $translationSitter = Mage::getModel("etre_translationsitter/translations");
         $uniqueIndex = [
+            'store_id' => $this->getStoreId(),
             'string' => $string,
             'crc_string' => crc32($string),
             'locale' => $this->getLocale(),
         ];
         $translationSitter->loadByUniqueIndex($uniqueIndex);
         $translationSitter->setData('translationsitter_source', $source);
-        $translationSitter->setData('store_id', $this->getStoreId());
         $translationSitter->setData('translate', $translated);
 
         try {
