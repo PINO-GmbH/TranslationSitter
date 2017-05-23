@@ -7,7 +7,7 @@ class Etre_TranslationSitter_Model_Google
     protected $sourceLanguage = "en";
     protected $locale;
     protected $storeId;
-    protected $apiBaseUrl = "https://www.googleapis.com/language/translate/v2";
+    protected $apiBaseUrl     = "https://www.googleapis.com/language/translate/v2";
 
     public function __construct()
     {
@@ -41,21 +41,29 @@ class Etre_TranslationSitter_Model_Google
 
     public function logAreaEnabled()
     {
-        $isAdmin = Mage::app()->getStore()->isAdmin();
+        $isAdmin    = Mage::app()->getStore()->isAdmin();
         $isFrontend = !$isAdmin;
-        $helper = Mage::helper("etre_translationsitter");
-        if ($isAdmin && $helper->getLogAdminEnabled()) return true;
-        if ($isFrontend && $helper->getLogFrontendEnabled()) return true;
+        $helper     = Mage::helper("etre_translationsitter");
+        if ($isAdmin && $helper->getLogAdminEnabled()) {
+            return true;
+        }
+        if ($isFrontend && $helper->getLogFrontendEnabled()) {
+            return true;
+        }
         return false;
     }
 
     public function autoGoogleTranslateEnabled()
     {
-        $isAdmin = Mage::app()->getStore()->isAdmin();
+        $isAdmin    = Mage::app()->getStore()->isAdmin();
         $isFrontend = !$isAdmin;
-        $helper = Mage::helper("etre_translationsitter");
-        if ($isAdmin && $helper->getAutoTranslateAdminEnabled()) return true;
-        if ($isFrontend && $helper->getAutoTranslateFrontEnabled()) return true;
+        $helper     = Mage::helper("etre_translationsitter");
+        if ($isAdmin && $helper->getAutoTranslateAdminEnabled()) {
+            return true;
+        }
+        if ($isFrontend && $helper->getAutoTranslateFrontEnabled()) {
+            return true;
+        }
         return false;
     }
 
@@ -66,10 +74,12 @@ class Etre_TranslationSitter_Model_Google
             if (isset($translated)):
                 $this->logTranslation($code, $translated, "Translation Sitter: Google API");
             else:
-                throw new Exception($this->__("There was a problem getting the translation from Google: {$translated}"));
+                throw new Exception(
+                    $this->__("There was a problem getting the translation from Google: {$translated}")
+                );
             endif;
         } catch (Exception $e) {
-            $integrityConstraintCode = 23000;
+            $integrityConstraintCode           = 23000;
             $isNotIntegrityConstraintViolation = $e->getCode() !== $integrityConstraintCode;
             if ($isNotIntegrityConstraintViolation):
                 /** Magento will not know that new translations have been inserted until the next page load.
@@ -86,14 +96,15 @@ class Etre_TranslationSitter_Model_Google
     protected function getApiTranslation($text = "")
     {
 
-        $stringToTranslate = urlencode($text);
+        $stringToTranslate   = urlencode($text);
         $destinationLanguage = strtok($this->getLocale(), "_");
-        $request = new Zend_Http_Client();
-        $uri = "{$this->apiBaseUrl}?key={$this->apiKey}&q={$stringToTranslate}&source={$this->sourceLanguage}&target={$destinationLanguage}";
+        $request             = new Zend_Http_Client();
+        $uri                 =
+            "{$this->apiBaseUrl}?key={$this->apiKey}&q={$stringToTranslate}&source={$this->sourceLanguage}&target={$destinationLanguage}";
         $request
             ->setUri($uri)
             ->request("GET");
-        $googleResponse = $request->getLastResponse()->getBody();
+        $googleResponse    = $request->getLastResponse()->getBody();
         $googleTranslation = json_decode($googleResponse);
         if (is_object($googleTranslation)):
             if (!$googleTranslation->error):
@@ -128,11 +139,11 @@ class Etre_TranslationSitter_Model_Google
     {
         /** @var Etre_TranslationSitter_Model_Translations $translationSitter */
         $translationSitter = Mage::getModel("etre_translationsitter/translations");
-        $uniqueIndex = [
-            'store_id' => $this->getStoreId(),
-            'string' => $string,
+        $uniqueIndex       = [
+            'store_id'   => $this->getStoreId(),
+            'string'     => $string,
             'crc_string' => crc32($string),
-            'locale' => $this->getLocale(),
+            'locale'     => $this->getLocale(),
         ];
         $translationSitter->loadByUniqueIndex($uniqueIndex);
         $translationSitter->setData('translationsitter_source', $source);
@@ -141,7 +152,13 @@ class Etre_TranslationSitter_Model_Google
         try {
             $translationSitter->save();
         } catch (Exception $e) {
-            Mage::logException($e);
+            /*
+             * To prevent constraint violations that stem from race-conditions (aka prevent duplicate entries as
+             * expected) from flooding our exception.log, we only log non-constraint-violation exception
+             */
+            if (!$this->_isConstraintViolationException($e)) {
+                Mage::logException($e);
+            }
         }
     }
 
@@ -159,6 +176,26 @@ class Etre_TranslationSitter_Model_Google
     public function setStoreId($storeId)
     {
         $this->storeId = $storeId;
+    }
+
+    /**
+     * Returns whether an exception indicates that a constraint was violated.
+     *
+     * @param Exception $e
+     * @return bool
+     */
+    protected function _isConstraintViolationException(Exception $e)
+    {
+        $isCcontraintViolation = false;
+        $message               = $e->getMessage();
+
+        switch (true) {
+            case (strpos($message, 'constraint violation') !== false):
+                $isCcontraintViolation = true;
+                break;
+        }
+
+        return $isCcontraintViolation;
     }
 
 }
